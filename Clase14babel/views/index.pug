@@ -1,0 +1,54 @@
+doctype html
+head
+    meta(charset='UTF-8')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title List of Products
+    link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css')
+body
+    h2 List of products
+    table.table
+        thead
+            tr
+            th(scope='col') #
+            th(scope='col') Title
+            th(scope='col') Price
+            th(scope='col') Thumbnail
+        tbody#tbody
+            each prod, i in products
+              -var img= prod.thumbnail
+                tr
+                    th(scope='row')= i + 1
+                    td= prod.title
+                    td= prod.price
+                    td
+                      img(src= img style='max-width: 50px' alt='Image not found')
+    a(href=dir) Agregar productos
+    br
+    a(href='http://localhost:8000/chat') Chat 
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io();
+
+        function render(prods) {
+            let tBody = document.querySelector('#tbody');
+            tBody.innerHTML = '';
+            let table = ''
+
+            prods.forEach((product, i) => {
+                table += `
+                    <tr>
+                        <th scope='row'>${i + 1}</th>
+                        <td>${product.title}</td>
+                        <td>${product.price}</td>
+                        <td>${product.thumbnail}</td>
+                    </tr>
+                `;
+            })
+            
+            tBody.innerHTML = table;
+        }
+        socket.on('products', ({products}) => {
+            console.log(products);
+            render(products);
+        }) 
