@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Form</title>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    
+
+
+    <h1>FORM:</h1>
+    <form action="/myform" enctype="application/x-www-form-urlencoded" method="POST">
+        <h3>Product:</h3>
+        <input type="text" name = "title"><br>
+        <h3>Price:</h3>
+        <input type="number" name = "price"><br>
+        <h3>Thumbnail:</h3>
+        <input type="text" name = "thumbnail">
+        <input type="submit">
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let inputValues = {
+            title: '',
+            price: '',
+            thumbnail: ''
+        }
+        const inputs = document.querySelectorAll('.input');
+
+        inputs.forEach(input => {
+            input.addEventListener('input', e => {
+                inputValues = {...inputValues, [e.target.name]: e.target.value}
+            })
+        })
+
+        document.querySelector('#form').addEventListener('submit', e => {
+            e.preventDefault();
+
+            const { title, price, thumbnail } = inputValues;
+
+            if([title.trim(), price.trim(), thumbnail.trim()].includes('')){
+                console.log('Error')
+                return;
+            }
+
+            document.querySelector('.error').innerHTML = '';
+            socket.emit('product', inputValues);
+            inputs.forEach(input => input.value = '');
+        })
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat</title>
+</head>
+<body>
+    <h1> CHAT </h1>
+
+    <form onsubmit="return addMessage (this)">
+        <input type="text" autocomplete="off" id="username" placeholder="Your mail"><br><br>
+        <input type="text" autocomplete="off" id="texto" placeholder="Tell us something...">
+        <input type="submit" value="Send">
+    </form>
+    <div id="messages"></div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('messages', function(data){
+            console.log(data);
+        })
+
+        function render (data) {
+            let html = data.map(function(elem, index){
+                return(`<div>
+                    <strong>${elem.author}</strong>:
+                    <em>${elem.date}</em>
+                    <em>${elem.text}</em></div>`)
+            }).join(" ");
+            document.getElementById('messages').innerHTML = html;
+        }
+
+        socket.on('messages', (data) => {
+            render (data);
+        });
+
+        const date = new Date();
+        let fecha = (`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}---${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}: `);
+
+        function addMessage (e) {
+        let mensaje = {
+            author: document.getElementById('username').value,
+            date: fecha,
+            text: document.getElementById('texto').value
+        };
+        socket.emit('new-message',mensaje);
+        return false;
+    }
+    </script>
+
+    <br><a href="http://localhost:8000">Volver</a>
+</body>
+</html>
